@@ -311,37 +311,6 @@ This solution received the **National Third Prize** in the 2024 China Graduate M
 
 This project was completed by a team of 3 members. This repository contains the work primarily done by one team member focusing on the machine learning prediction component.
 
-本项目由3人团队共同完成。本仓库包含的是主要负责机器学习预测部分的队员的工作。
+本项目由3人团队共同完成。本仓库包含的是主要负责机器学习预测部分的工作。
 
----
 
-## License / 许可证
-
-This project is open-sourced under the MIT License.
-
-本项目基于MIT许可证开源。
-
----
-
-## Citation / 引用
-
-If you use this project in your research, please cite:
-
-如果您在研究中使用了本项目，请引用：
-
-```bibtex
-@misc{highway-emergency-lane-2024,
-  title={Highway Emergency Lane Activation Decision Model - Traffic Congestion Prediction},
-  author={[Your Name]},
-  year={2024},
-  note={2024 China Graduate Mathematical Contest in Modeling - Problem E}
-}
-```
-
----
-
-## Contact / 联系方式
-
-For questions or suggestions, please open an issue on GitHub.
-
-如有问题或建议，请在GitHub上提交Issue。
