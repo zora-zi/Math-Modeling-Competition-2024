@@ -298,9 +298,9 @@ This solution received the **National Third Prize** in the 2024 China Graduate M
 
 ## Authors / 作者
 
-- **Zhong Wei** (钟伟)
-- **Wang Xijing** (王希景)
-- **Ding Anran** (丁安然)
+- **Zhong Wei** 
+- **Wang Xijing** 
+- **Ding Anran** 
 
 ---
 
