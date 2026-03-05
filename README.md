@@ -12,22 +12,18 @@
 
 ## Project Overview / 项目概述
 
-This repository contains **Part 2 (Traffic Congestion Prediction Model)** of our complete solution for the 2024 CGMCM Problem E. The full solution addresses highway emergency lane activation decisions through four sub-problems, and this repository focuses on the machine learning prediction component.
+This repository presents our team's solution for the 2024 China Graduate Mathematical Contest in Modeling (Problem E). The project builds a complete pipeline from surveillance video analysis to real-time emergency lane activation decisions on highways.
 
-本仓库包含2024年研究生数学建模竞赛E题完整解决方案中的**第二部分（交通流拥堵预测模型）**。完整方案通过四个子问题研究高速公路应急车道启用决策，本仓库聚焦于机器学习预测部分。
+本仓库是我们团队在2024年研究生数学建模竞赛E题中的解决方案。项目构建了从监控视频分析到高速公路应急车道实时启用决策的完整流程。
 
-### What's Included / 包含内容
+### Problem Structure / 题目结构
 
-| Component | Status | Description |
-|-----------|--------|-------------|
-| Problem 1: Traffic Flow Analysis | Data Only | 交通流变化规律分析（仅数据） |
-| **Problem 2: Congestion Prediction** | **Complete** | **交通拥堵预测模型（完整代码）** |
-| Problem 3: Lane Activation Decision | Partial | 应急车道启用决策（部分） |
-| Problem 4: Monitoring Point Calculation | Not Included | 监控点计算（未包含） |
-
-> Note: Problem 1 (YOLOv8 + DeepSORT video processing) and Problem 4 were implemented by other team members and are not included in this repository.
->
-> 注：问题一（YOLOv8+DeepSORT视频处理）和问题四由其他队友实现，未包含在本仓库中。
+| Sub-problem | Topic | Description |
+|-------------|-------|-------------|
+| Problem 1 | Traffic Flow Analysis | 交通流变化规律分析：使用YOLOv8+DeepSORT从视频中提取交通参数 |
+| Problem 2 | Congestion Prediction | 交通拥堵预测模型：基于多种ML算法进行多时间跨度拥堵预测 |
+| Problem 3 | Lane Activation Decision | 应急车道启用决策：拥堵阈值计算与实时启用策略 |
+| Problem 4 | Monitoring Optimization | 监控点优化布设：合理性分析与监控点计算 |
 
 ---
 
@@ -35,24 +31,32 @@ This repository contains **Part 2 (Traffic Congestion Prediction Model)** of our
 
 ![Technical Roadmap](docs/technical_roadmap_full.png)
 
-### Problem 2: Traffic Congestion Prediction Model / 问题二：交通拥堵预测模型
-
-This is the core component of this repository:
-
-这是本仓库的核心内容：
+### Overall Pipeline / 整体流程
 
 ```
-Input: Traffic parameters from 4 surveillance cameras (Cameras 1-3 as features, Camera 4 as target)
-输入：4个监控摄像头的交通参数（摄像头1-3作为特征，摄像头4作为预测目标）
-
-Process: Multi-horizon prediction using ML algorithms
-处理：使用机器学习算法进行多时间跨度预测
-
-Output: Congestion level prediction for 5/10/15/20/25/30 minutes ahead
-输出：提前5/10/15/20/25/30分钟的拥堵程度预测
+[Surveillance Video]  →  [YOLOv8 + DeepSORT]  →  [Feature Extraction]  →  [ML Prediction]  →  [Activation Decision]
+     监控视频               目标检测+跟踪            特征提取与聚合          机器学习预测          应急车道启用决策
+    (Problem 1)            (Problem 1)             (Problem 1→2)          (Problem 2)           (Problem 3)
 ```
 
-### Implemented ML Algorithms / 实现的机器学习算法
+### Problem 1: Video Analysis / 视频分析
+
+Traffic parameters are extracted from highway surveillance videos using [YOLOv8-DeepSORT-Object-Tracking](https://github.com/MuhammadMoinFaisal/YOLOv8-DeepSORT-Object-Tracking):
+
+使用 [YOLOv8-DeepSORT-Object-Tracking](https://github.com/MuhammadMoinFaisal/YOLOv8-DeepSORT-Object-Tracking) 从高速公路监控视频中提取交通参数：
+
+- **YOLOv8**: Real-time vehicle detection (vehicle count, type classification) / 实时车辆检测（车辆计数、类型分类）
+- **DeepSORT**: Multi-object tracking (vehicle ID, speed estimation, lane changes) / 多目标跟踪（车辆编号、速度估计、变道检测）
+- **Aggregation**: Frame-level detections → per-minute traffic statistics / 逐帧检测结果 → 分钟级交通统计数据
+- **Data Cleaning**: 3σ rule for outlier removal, mean imputation for anomalies / 3σ准则异常值剔除，均值替换异常数据
+
+### Problem 2: Congestion Prediction / 拥堵预测
+
+Core idea: Use upstream camera data (Cameras 1-3) to predict downstream congestion (Camera 4) with 5-30 minutes advance warning.
+
+核心思想：利用上游摄像头数据（摄像头1-3）预测下游摄像头4的拥堵情况，提前5-30分钟预警。
+
+**Implemented ML Algorithms / 实现的机器学习算法：**
 
 - Linear Regression / 线性回归
 - Decision Tree / 决策树
@@ -64,48 +68,100 @@ Output: Congestion level prediction for 5/10/15/20/25/30 minutes ahead
 - SVR (Support Vector Regression) / 支持向量回归
 - Extra Tree Regressor / 极端随机树
 
+### Problem 3: Activation Decision / 启用决策
+
+Based on the congestion prediction results, establish threshold conditions for emergency lane activation and quantify the relief effect.
+
+基于拥堵预测结果，建立应急车道启用阈值条件，并量化启用后的缓解效果。
+
+### Problem 4: Monitoring Optimization / 监控优化
+
+Literature survey and data-driven analysis for optimal surveillance camera placement on highway segments.
+
+基于文献调研和数据驱动分析，优化高速公路路段的监控摄像头布设方案。
+
 ---
 
 ## Project Structure / 项目结构
 
 ```
-highway-emergency-lane-model/
-├── README.md                           # Project documentation / 项目文档
+Math-Modeling-Competition-2024/
+├── README.md                              # 项目文档
 ├── .gitignore
 │
-├── src/                                # Source code / 源代码
-│   ├── data_processing.py              # Data preprocessing / 数据预处理
-│   │                                   # - Read CSV from multiple cameras
-│   │                                   # - Align timestamps across cameras
-│   │                                   # - Generate train/test datasets
+├── src/                                   # 源代码（增强版）
+│   ├── data_processing.py                 # 数据预处理
+│   │                                      # 读取多摄像头CSV → 时间对齐 → 构建ML数据集
+│   │                                      # 使用11列特征（含拥堵等级+时间类别标签）
+│   │                                      # 随机采样划分训练/测试集
 │   │
-│   ├── model.py                        # ML model classes / 机器学习模型类
-│   │                                   # - model_v1: Model container
-│   │                                   # - Model_MachineLearning: Algorithm wrapper
+│   ├── model.py                           # 机器学习模型类定义
+│   │                                      # model_v1: 模型容器（存储/加载/评估）
+│   │                                      # Model_MachineLearning: 算法封装
+│   │                                      # 默认算法：Decision Tree
 │   │
-│   └── train_predict.py                # Training & evaluation / 训练与评估
-│                                       # - Train models for 6 time horizons
-│                                       # - Evaluate with MAE, accuracy, R²
-│                                       # - Export results to Excel
+│   ├── train_predict.py                   # 模型训练与评估
+│   │                                      # 6个时间跨度 × 多种算法
+│   │                                      # 评估指标：MAE、准确率、R²
+│   │                                      # 结果导出为Excel
+│   │
+│   └── baseline/                          # 基线版代码（初始方案）
+│       ├── data_processing.py             # 基线数据预处理（9列特征，固定划分）
+│       ├── model.py                       # 基线模型（默认Linear Regression）
+│       └── train_predict.py              # 基线训练与评估
 │
-├── data/                               # Data directory / 数据目录
-│   ├── README.md                       # Data format documentation / 数据格式说明
-│   ├── sample/                         # Sample data files / 示例数据
+├── data/                                  # 数据目录
+│   ├── README.md                          # 数据格式文档
+│   ├── sample/                            # 示例数据
 │   │   ├── 1_1141_uncover_res_minute.csv
 │   │   └── 4_1256_uncover_res_minute.csv
-│   └── processed/                      # Processed ML datasets / 处理后的数据集
+│   └── processed/                         # 处理后的ML数据集
 │
-├── results/                            # Model outputs / 模型输出
-│   └── sample/                         # Sample results / 示例结果
+├── results/                               # 模型输出
+│   └── sample/                            # 示例预测结果
 │       ├── reluts_of_decisiontree.xls
 │       └── reluts_of_randonforest.xls
 │
-└── docs/                               # Documentation & figures / 文档与图表
-    ├── technical_roadmap_full.png      # Full technical roadmap / 全文技术路线图
-    ├── technical_roadmap.jpg           # Technical roadmap / 技术路线图
-    ├── paper_architecture.png          # Paper structure / 论文架构图
-    └── emergency_lane_effect.jpg       # Effect comparison / 应急车道效果对比
+└── docs/                                  # 文档与图表
+    ├── technical_roadmap_full.png         # 全文技术路线图
+    ├── technical_roadmap.jpg              # 技术路线图
+    ├── paper_architecture.png             # 论文架构图
+    └── emergency_lane_effect.jpg          # 应急车道启用效果对比
 ```
+
+---
+
+## Code Versions / 代码版本
+
+The prediction code went through two iterations:
+
+预测代码经历了两次迭代：
+
+### Baseline (`src/baseline/`) / 基线版
+
+The initial proof-of-concept using basic traffic features:
+
+初始验证方案，使用基础交通特征：
+
+| Aspect | Details |
+|--------|---------|
+| Data | 9列基础交通参数（车辆数、速度、密度、大车比例、变道率、速度方差、流量、拥堵指数） |
+| Target | 单一拥堵指数（congestion_idx） |
+| Split | 全量数据训练，固定区间（第50-85分钟）测试 |
+| Default Algorithm | Linear Regression（线性回归） |
+
+### Enhanced (`src/`) / 增强版
+
+The improved version with classification labels and randomized sampling:
+
+加入分类标签和随机采样的改进版本：
+
+| Aspect | Details |
+|--------|---------|
+| Data | 11列特征（在基线版基础上增加拥堵等级、时间类别两个分类标签） |
+| Target | 拥堵等级（congestion_level，从多维标签中提取） |
+| Split | 随机采样100行训练 + 随机采样30行测试 |
+| Default Algorithm | Decision Tree（决策树） |
 
 ---
 
@@ -114,52 +170,37 @@ highway-emergency-lane-model/
 ### Data Pipeline / 数据流程
 
 ```
-[Surveillance Video] → [YOLOv8 + DeepSORT] → [Raw Detection] → [Aggregation] → [ML Dataset]
-   监控视频              目标检测+跟踪          原始检测结果       聚合统计        机器学习数据集
-                         (Not included)
-                          (未包含)
+[Highway Video] → [YOLOv8 Detection] → [DeepSORT Tracking] → [Per-frame Stats] → [Per-minute Aggregation] → [ML Dataset]
+  高速监控视频       车辆检测              车辆跟踪               逐帧统计             分钟级聚合              机器学习数据集
 ```
 
-### Input Data Format / 输入数据格式
+### Input Data Format (Enhanced) / 输入数据格式（增强版）
 
-Each CSV file contains per-minute aggregated traffic parameters:
+| Column | Field | Description | Unit |
+|--------|-------|-------------|------|
+| 0 | time_idx | 时间索引 | min |
+| 1 | vehicle_count | 车辆总数 | count |
+| 2 | avg_speed | 平均速度 | km/h |
+| 3 | density | 交通密度 | veh/km |
+| 4 | large_vehicle_ratio | 大型车比例 | % |
+| 5 | lane_change_rate | 变道率 | times/min |
+| 6 | speed_variance | 速度方差 | (km/h)² |
+| 7 | flow_rate | 交通流量 | veh/h |
+| 8 | congestion_idx | 拥堵指数 | - |
+| 9 | congestion_level | 拥堵等级（分类标签） | 0/1 |
+| 10 | time_category | 时间类别（分类标签） | 0/1 |
 
-每个CSV文件包含按分钟聚合的交通参数：
-
-| Column | Field | Description (EN) | Description (CN) | Unit |
-|--------|-------|------------------|------------------|------|
-| 0 | time_idx | Time index | 时间索引 | min |
-| 1 | vehicle_count | Total vehicle count | 车辆总数 | count |
-| 2 | avg_speed | Average speed | 平均速度 | km/h |
-| 3 | density | Traffic density | 交通密度 | veh/km |
-| 4 | large_vehicle_ratio | Large vehicle ratio | 大型车比例 | % |
-| 5 | lane_change_rate | Lane change rate | 变道率 | times/min |
-| 6 | speed_variance | Speed variance | 速度方差 | (km/h)² |
-| 7 | flow_rate | Traffic flow rate | 交通流量 | veh/h |
-| 8 | congestion_idx | Congestion index | 拥堵指数 | - |
-| 9 | congestion_level | Congestion level (label) | 拥堵等级 | 0/1 |
-| 10 | time_category | Time category (label) | 时间类别 | 0/1 |
+> Baseline version uses columns 0-8 only. / 基线版仅使用第0-8列。
 
 ### File Naming Convention / 文件命名规则
 
 ```
 {camera}_{video_id}_{status}_res_minute.csv
 
-camera:   1-4 (surveillance camera ID / 摄像头编号)
-video_id: Video segment identifier / 视频片段标识
-status:   uncover = normal driving / 正常行驶
-          cover_far = emergency lane opened / 应急车道开启
+camera:   1-4（摄像头编号）
+video_id: 视频片段标识
+status:   uncover = 正常行驶 / cover_far = 应急车道开启
 ```
-
-### Data Source / 数据来源
-
-The CSV data was generated by team members using:
-- **YOLOv8**: Vehicle detection from surveillance video / 从监控视频中检测车辆
-- **DeepSORT**: Multi-object tracking / 多目标跟踪
-- **Custom scripts**: Frame-by-frame extraction and aggregation / 逐帧提取与聚合
-
-> The video processing code (Problem 1) is not included in this repository.
-> 视频处理代码（问题一）未包含在本仓库中。
 
 ---
 
@@ -175,8 +216,8 @@ pip install numpy pandas scikit-learn xlrd xlwt
 
 ```bash
 # 1. Clone the repository / 克隆仓库
-git clone https://github.com/[username]/highway-emergency-lane-model.git
-cd highway-emergency-lane-model
+git clone https://github.com/zora-zi/Math-Modeling-Competition-2024.git
+cd Math-Modeling-Competition-2024
 
 # 2. Prepare your data / 准备数据
 # Place CSV files in data/ directory following the naming convention
@@ -190,13 +231,19 @@ python data_processing.py
 python train_predict.py
 
 # 5. Check results / 查看结果
-# Results will be saved in ../results/prediction_results.xls
+# Results saved in ../results/prediction_results.xls
 # 结果保存在 ../results/prediction_results.xls
 ```
 
-### Customization / 自定义配置
+### Run Baseline Version / 运行基线版
 
-**Change ML algorithm / 更换机器学习算法**：
+```bash
+cd src/baseline
+python data_processing.py
+python train_predict.py
+```
+
+### Switch Algorithm / 切换算法
 
 Edit `src/model.py`, uncomment the desired algorithm in `Model_MachineLearning.__init__()`:
 
@@ -214,12 +261,6 @@ def __init__(self):
     # self.model = BaggingRegressor()
     # self.model = ExtraTreeRegressor()
 ```
-
-**Change prediction horizons / 更换预测时间跨度**：
-
-Edit `src/data_processing.py`, modify the `time` parameter in `make_data_set()` calls.
-
-编辑 `src/data_processing.py`，修改 `make_data_set()` 调用中的 `time` 参数。
 
 ---
 
@@ -247,58 +288,6 @@ The scatter plot demonstrates congestion index **before (orange)** and **after (
 
 ---
 
-## Methodology / 方法论
-
-### Core Idea / 核心思想
-
-Use upstream camera data (Cameras 1-3) to predict downstream congestion (Camera 4) with advance warning time of 5-30 minutes.
-
-利用上游摄像头数据（摄像头1-3）预测下游拥堵情况（摄像头4），提前预警时间为5-30分钟。
-
-### Key Steps / 关键步骤
-
-1. **Time Alignment / 时间对齐**: Align data from 4 cameras based on video start time offsets
-   
-   根据视频起始时间偏移对齐4个摄像头的数据
-
-2. **Feature Engineering / 特征工程**: Use Camera 1-3 data as input features, Camera 4 congestion level as target
-   
-   使用摄像头1-3数据作为输入特征，摄像头4拥堵等级作为目标
-
-3. **Multi-horizon Prediction / 多时间跨度预测**: Train separate models for 5/10/15/20/25/30 min prediction
-   
-   为5/10/15/20/25/30分钟预测分别训练模型
-
-4. **Model Comparison / 模型对比**: Evaluate multiple ML algorithms using MAE, accuracy, R²
-   
-   使用MAE、准确率、R²评估多种机器学习算法
-
----
-
-## Missing Components / 缺失部分
-
-The following components were implemented by other team members and are not included:
-
-以下部分由其他队友实现，未包含在本仓库中：
-
-### Problem 1: Traffic Flow Analysis / 问题一：交通流变化规律分析
-- YOLOv8 vehicle detection / YOLOv8车辆检测
-- DeepSORT multi-object tracking / DeepSORT多目标跟踪
-- Frame-by-frame data extraction / 逐帧数据提取
-- 3σ rule data cleaning / 3σ准则数据清洗
-- Pearson correlation analysis / 皮尔逊相关性分析
-- Box plot visualization / 箱线图可视化
-
-### Problem 3: Lane Activation Decision / 问题三：应急车道启用决策
-- Congestion threshold calculation / 拥堵阈值计算
-- Real-time activation strategy / 实时启用策略
-
-### Problem 4: Monitoring Point Calculation / 问题四：监控点计算
-- Optimal camera placement algorithm / 最优摄像头布置算法
-- Rationality analysis / 合理性分析
-
----
-
 ## Award / 获奖情况
 
 This solution received the **National Third Prize** in the 2024 China Graduate Mathematical Contest in Modeling (CGMCM).
@@ -307,11 +296,20 @@ This solution received the **National Third Prize** in the 2024 China Graduate M
 
 ---
 
-## Team / 团队
+## Authors / 作者
 
-This project was completed by a team of 3 members. This repository contains the work primarily done by one team member focusing on the machine learning prediction component.
+- **Zhong Wei** (钟伟)
+- **Wang Xijing** (王希景)
+- **Ding Anran** (丁安然)
 
-本项目由3人团队共同完成。本仓库包含的是主要负责机器学习预测部分的队员的工作。
+---
+
+## References / 参考引用
+
+- **YOLOv8-DeepSORT**: [MuhammadMoinFaisal/YOLOv8-DeepSORT-Object-Tracking](https://github.com/MuhammadMoinFaisal/YOLOv8-DeepSORT-Object-Tracking) - Vehicle detection and tracking from surveillance videos / 监控视频车辆检测与跟踪
+- **scikit-learn**: Machine learning algorithms implementation / 机器学习算法实现
+- **YOLOv8**: Ultralytics YOLO for real-time object detection / 实时目标检测
+- **DeepSORT**: Simple Online and Realtime Tracking with a Deep Association Metric / 深度关联度量的在线实时跟踪
 
 ---
 
@@ -331,10 +329,10 @@ If you use this project in your research, please cite:
 
 ```bibtex
 @misc{highway-emergency-lane-2024,
-  title={Highway Emergency Lane Activation Decision Model - Traffic Congestion Prediction},
-  author={[Your Name]},
+  title={Highway Emergency Lane Activation Decision Model},
+  author={Zhong Wei and Wang Xijing and Ding Anran},
   year={2024},
-  note={2024 China Graduate Mathematical Contest in Modeling - Problem E}
+  note={2024 China Graduate Mathematical Contest in Modeling - Problem E, National Third Prize}
 }
 ```
 
